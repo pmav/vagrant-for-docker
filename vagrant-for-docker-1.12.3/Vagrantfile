@@ -1,0 +1,23 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "debian/jessie64"
+  config.vm.network "private_network", ip: "192.168.99.99"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "vm-docker-1.12.3"
+    vb.gui = false
+    vb.memory = "256"
+    vb.cpus = 1
+  end
+
+  config.vm.provision "shell", inline: <<-SHELL
+    apt-get install -y apt-transport-https
+    apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+    sh -c "echo deb https://apt.dockerproject.org/repo debian-jessie main > /etc/apt/sources.list.d/docker.list"
+    apt-get update
+    apt-get install -y docker-engine=1.12.3-0~jessie zip
+    usermod -a -G docker vagrant
+  SHELL
+end
